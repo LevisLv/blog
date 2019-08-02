@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /tags/
+Allow: /archives/
+Allow: /board/
+
+Disallow: /js/
+Disallow: /css/
+Disallow: /fonts/
+
+Sitemap: https://blog.levislv.com/sitemap.xml
+Sitemap: https://blog.levislv.com/baidusitemap.xml
