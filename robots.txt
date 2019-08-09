@@ -1,7 +1,11 @@
 User-agent: *
 Allow: /
-Allow: /tags/
 Allow: /archives/
+Allow: /tags/
+Allow: /categories/
+Allow: /music/
+Allow: /video/
+Allow: /link/
 Allow: /board/
 
 Disallow: /js/
