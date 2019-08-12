@@ -53,7 +53,8 @@ ga('send', 'pageview');
 <li>Model就是领域模型，数据对象，同时，提供外部对应用程序数据的操作的接口，也可能在数据变化时发出变更通知。Model不依赖于View的实现，只要外部程序调用Model的接口就能够实现对数据的增删改查。</li>
 <li>View就是UI层，提供对最终用户的交互操作功能，包括UI展现代码及一些相关的界面逻辑代码。</li>
 </ol>
-<p>三者的差异在于如何粘合Model和View，实现用户的交互操作以及变更通知<br><img src="http://img.blog.csdn.net/20140401173412296?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbmFwb2x1bnlpc2hp/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt></p>
+<p>三者的差异在于如何粘合Model和View，实现用户的交互操作以及变更通知</p>
+
 <ol>
 <li>Controller接收View的操作事件，根据事件不同，或者调用Model的接口进行数据操作，或者进行View的跳转，从而也意味着一个Controller可以对应多个View。Controller对View的实现不太关心，只会被动地接收，Model的数据变更不通过Controller直接通知View，通常View采用观察者模式监听Model的变化。</li>
 <li>Presenter，与Controller一样，接收View的命令，对Model进行操作；与Controller不同的是Presenter会反作用于View，Model的变更通知首先被Presenter获得，然后Presenter再去更新View。一个Presenter只对应于一个View。根据Presenter和View对逻辑代码分担的程度不同，这种模式又有两种情况：Passive View和Supervisor Controller。</li>
