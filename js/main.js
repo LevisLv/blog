@@ -1,4 +1,8 @@
 $(function () {
+
+  /**
+   * 進入post頁sidebar自動打開
+   */
   if ($('#sidebar').hasClass('auto_open')) {
     if ($(".sidebar-toc__content").children().length > 0) {
       $(".layout_post").animate({}, function () {
@@ -9,11 +13,11 @@ $(function () {
             $('body').animate({
               paddingLeft: 300
             }, 200)
-            $('#sidebar').animate({}, function () {
-              $('#sidebar').css({
-                'transform': 'translateX(300px)'
-              }, 200)
-            })
+
+            $('#sidebar').animate({
+              left: 0
+            }, 200)
+
             $('#toggle-sidebar').animate({}, function () {
               $('#toggle-sidebar').css({
                 'transform': 'rotateZ(180deg)',
@@ -32,8 +36,9 @@ $(function () {
   }
 
 
-  //-------------------------------------------------------------------------------------------------------
-  //sidebar
+  /**
+   * 點擊左下角箭頭,顯示sidebar
+   */
   $('#toggle-sidebar').on('click', function () {
 
     if (!isMobile() && $('#sidebar').is(':visible')) {
@@ -45,11 +50,9 @@ $(function () {
           paddingLeft: 0
         }, 200)
 
-        $('#sidebar').animate({}, function () {
-          $('#sidebar').css({
-            'transform': 'translateX(0px)'
-          })
-        })
+        $('#sidebar').animate({
+          left: -300
+        }, 200)
 
         $('#toggle-sidebar').animate({}, function () {
           $('#toggle-sidebar').css({
@@ -63,11 +66,11 @@ $(function () {
         $('body').animate({
           paddingLeft: 300
         }, 200)
-        $('#sidebar').animate({}, function () {
-          $('#sidebar').css({
-            'transform': 'translateX(300px)'
-          })
-        })
+
+        $('#sidebar').animate({
+          left: 0
+        }, 200)
+
         $('#toggle-sidebar').animate({}, function () {
           $('#toggle-sidebar').css({
             'transform': 'rotateZ(180deg)',
@@ -78,25 +81,25 @@ $(function () {
     }
   })
 
-  //-----------------------------------------------------------------------------------------------------
-  // 首页fullpage添加
-  // 添加class 
-  if (/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(navigator.userAgent)) { } else {
-    $('.full_page').css('background-attachment', 'fixed');
-    $('#to_comment').css("display", "block")
+  /**
+   * 首頁fullpage添加
+   * 添加class
+   */
+  if (/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(navigator.userAgent)) {} else {
+    $('.full_page .nav_bg').css('background-attachment', 'fixed');
   }
 
-  //---------------------------------------------------------------------------------------------------------
-  
+  /**
+   * 首頁top_img底下的箭頭
+   */
   $(".scroll-down").on("click", function () {
-
     scrollTo('#content-outer')
-
   });
 
 
-  //--------------------------------------------------------------------------------------------------------
-  // bookmark
+  /**
+   * BOOKMARK 書簽
+   */
   $.fancyConfirm = function (opts) {
     opts = $.extend(true, {
       title: 'Are you sure?',
@@ -111,7 +114,7 @@ $(function () {
       src: '<div class="fc-content">' +
         '<h3>' + opts.title + '</h3>' +
         '<p>' + opts.message + '</p>' +
-        '<p class="tright">' +
+        '<p class="is_right">' +
         '<button data-value="1" data-fancybox-close class="bookmark-ok">' + opts.okButton + '</button>' +
         '</p>' +
         '</div>',
@@ -149,13 +152,14 @@ $(function () {
       }
     });
 
-  //-------------------------------------------------------------------------------------------------------
-  //代码copy
-  // Add copy icon
+  /**
+   * 代碼copy
+   * Add copy icon
+   */
+  $('figure.highlight').wrap('<div class="code-area-wrap"></div>')
 
   var highlight_copy = GLOBAL_CONFIG.highlight_copy
   if (highlight_copy == 'true') {
-    $('figure.highlight').wrap('<div class="code-area-wrap"></div>')
     var $copyIcon = $('<i class="fa fa-clipboard" aria-hidden="true"></i>')
     var $notice = $('<div class="copy-notice"></div>')
     $('.code-area-wrap').prepend($copyIcon)
@@ -210,8 +214,54 @@ $(function () {
       selection.removeAllRanges()
     })
   }
-  //---------------------------------------------------------------------------------------------------
-  //fancybox
+
+  /**
+   * 代碼框語言識別
+   */
+  var highlight_lang = GLOBAL_CONFIG.highlight_lang
+  if (highlight_lang == 'true') {
+    var $highlight_lang = $('<div class="code_lang"></div>')
+    $('figure').before($highlight_lang)
+    var lang_name_index
+    var lang_name
+    $('figure').each(function () {
+      lang_name_index = lang_name = $(this).attr('class').split(' ')[1];
+      if (lang_name_index == 'js')
+        lang_name = 'javascript'
+      if (lang_name_index == 'md')
+        lang_name = 'markdown'
+      if (lang_name_index == 'plain')
+        lang_name = 'code'
+      if (lang_name_index == 'py')
+        lang_name = 'python'
+
+      $(this).siblings(".code_lang").text(lang_name)
+
+    })
+  }
+  /**
+   * 代碼收縮
+   */
+  var highlight_shrink = GLOBAL_CONFIG.highlight_shrink
+  if (highlight_shrink == 'true') {
+    var $code_expand = $('<i class="fa fa-angle-down code-expand code-closed" aria-hidden="true"></i>')
+  } else {
+    var $code_expand = $('<i class="fa fa-angle-down code-expand" aria-hidden="true"></i>')
+  }
+  $('.code-area-wrap').prepend($code_expand)
+  $('.code-area-wrap .code-expand').on('click', function () {
+    if ($(this).hasClass('code-closed')) {
+      $(this).siblings('figure').find('table').show();
+      $(this).removeClass('code-closed');
+    } else {
+      $(this).siblings('figure').find('table').hide();
+      $(this).addClass('code-closed');
+    }
+  })
+
+  /**
+   * fancybox
+   */
   var imgList = $(".recent-post-info  img").not('.no-fancybox');
   if (imgList.length === 0) {
     imgList = $("#post-content img").not('.no-fancybox');
@@ -219,13 +269,13 @@ $(function () {
 
   for (var i = 0; i < imgList.length; i++) {
     var lazyload_src = imgList[i].src ? imgList[i].src : imgList.eq(i).attr("data-src")
-    
+
     var $a = $(
       '<a href="' +
       lazyload_src +
-        '" data-fancybox="group" data-caption="' +
-        imgList[i].alt +
-        '" class="fancybox"></a>'
+      '" data-fancybox="group" data-caption="' +
+      imgList[i].alt +
+      '" class="fancybox"></a>'
     )
 
     var alt = imgList[i].alt
@@ -265,47 +315,68 @@ $(function () {
 
   });
 
-  //---------------------------------------------------------------------------------------------------------
-  /** head点击*/
-  $('.toggle-menu').on('click', function () {
+  /**
+   * 手機menu和toc按鈕點擊
+   * 顯示menu和toc的sidebar
+   */
+  function mobile_menu_close() {
     if ($(".toggle-menu").hasClass("open")) {
       $(".toggle-menu").removeClass("open").addClass("close");
-      $('body').addClass("is_hidden");
-      $('.menus').animate({
-        right: 0
-      }, 300 )
-      $('.menu_mask,.menus').css("display","block")
+      $('body').removeClass("open-mobile-menus");
+      $('#menu_mask').fadeOut()
     }
+
+  }
+
+  function mobile_toc_close() {
+    if ($("#mobile-toc-button").hasClass("open")) {
+      $("#mobile-toc-button").removeClass("open").addClass("close");
+      $('body').removeClass("open-mobile-toc");
+      $('#menu_mask').fadeOut();
+    }
+
+  }
+  $('.toggle-menu').on('click', function () {
+    if ($(".toggle-menu").hasClass("close")) {
+      $(".toggle-menu").removeClass("close").addClass("open");
+      $('body').addClass("open-mobile-menus");
+      $('#menu_mask').fadeIn();
+    }
+
   })
 
-  $('.menu_mask ').on('click touchstart', function () {
-    $(".toggle-menu").removeClass("close").addClass("open");
-    $('body').removeClass("is_hidden");
-    $('.menus').animate({
-      right: -250
-    }, 300,function () {
-      {$('.menus').css({ 'display': ''})
+  $('#mobile-toc-button').on('click', function () {
+    if ($("#mobile-toc-button").hasClass("close")) {
+      $("#mobile-toc-button").removeClass("close").addClass("open");
+      $('body').addClass("open-mobile-toc");
+      $('#menu_mask').fadeIn();
     }
+
   })
-    $('.menu_mask').css("display","")
+
+  $('#menu_mask').on('click touchstart', function () {
+    mobile_menu_close()
+    mobile_toc_close()
   })
 
   $(window).on('resize', function (e) {
     if (!$('.toggle-menu').is(':visible')) {
-      if ($(".toggle-menu").hasClass("close")) {
-        $(".toggle-menu").removeClass("close").addClass("open");
-        $('body').removeClass("is_hidden");
-        $('.menus').animate({
-          right: -250
-        }, 300)
-        $('.menu_mask').css("display","")
-          }
+      mobile_menu_close()
     }
-  } )   
+    if (!$('#mobile-toc-button').is(':visible')) {
+      mobile_toc_close()
+    }
 
+  })
 
-  //---------------------------------------------------------------------------------------------------------
-  /** scroll 滚动 toc*/
+  //點擊toc，收起sidebar
+  $("#mobile-sidebar-toc a").on('click', function () {
+    mobile_toc_close()
+  })
+
+  /**
+   *  scroll 滚动 toc
+   */
   var initTop = 0
   $('.toc-child').hide()
 
@@ -317,75 +388,40 @@ $(function () {
       scrollPercent(currentTop)
       // head position
       findHeadPosition(currentTop)
+      auto_scroll_toc(currentTop)
+
     }
     var isUp = scrollDirection(currentTop)
 
-    if ($(".toggle-menu").hasClass("open")) {
-      if (currentTop > 56) {
-        
-        if (isUp) {
-          $('#page-header').hasClass('visible') ? $('#page-header').removeClass('visible') : console.log()
-          $('#post_bottom').removeClass('toc_mobile_show')
-          $('#toc_mobile').hasClass('is_visible') ? $('#toc_mobile').removeClass('is_visible') : console.log()
-
-        } else {
-          $('#page-header').hasClass('visible') ? console.log() : $('#page-header').addClass('visible')
-          $('#post_bottom').addClass('toc_mobile_show')
-          $('#toc_mobile').hasClass('is_visible') ? $('#toc_mobile').removeClass('is_visible') : console.log()
-
-        }
-        $('#page-header').addClass('fixed')
-        if ($('#go-up').css('opacity') === '0') {
-
-          $('#go-up').animate({}, function () {
-            $('#go-up').css({
-              'opacity': '1',
-              'transform': 'translateX(-30px) rotateZ(360deg)'
-            })
-          })
-        }
-        if ($('#rightside').css('opacity') === '0') {
-
-          $('#rightside').animate({}, function () {
-            $('#rightside').css({
-              'opacity': '1',
-              'transform': 'translateX(-38px)'
-            })
-          })
-        }
-
+    if (currentTop > 56) {
+      if (isUp) {
+        $('#page-header').hasClass('visible') ? $('#page-header').removeClass('visible') : console.log()
 
       } else {
-        if (currentTop === 0) {
-          $('#page-header').removeClass('fixed').removeClass('visible')
-          $('#post_bottom').removeClass('toc_mobile_show')
-
-        }
-
-        $('#go-up').animate({}, function () {
-          $('#go-up').css({
-            'opacity': '0',
-            'transform': 'translateX(0) rotateZ(180deg) '
-          })
-        })
-
-        $('#rightside').animate({}, function () {
-          $('#rightside').css({
-            'opacity': '0',
-            'transform': 'translateX(0)'
-          })
-        })
-
+        $('#page-header').hasClass('visible') ? console.log() : $('#page-header').addClass('visible')
       }
-    }
+      $('#page-header').addClass('fixed')
 
-    if ( $(window).width() <= 768 &&  $('#post_bottom').hasClass('toc_mobile_show') ){
-      $('#rightside').css('bottom', '110px')
-      $('#go-up').css('bottom', '70px')
-  
+      if ($('#rightside').css('opacity') === '0') {
+        $('#rightside').animate({}, function () {
+          $(this).css({
+            'opacity': '1',
+            'transform': 'translateX(-38px)'
+          })
+        })
+      }
     } else {
-      $('#rightside').css('bottom', '60px')
-      $('#go-up').css('bottom', '20px')
+      if (currentTop === 0) {
+        $('#page-header').removeClass('fixed').removeClass('visible')
+      }
+
+      $('#rightside').animate({}, function () {
+        $('#rightside').css({
+          'opacity': '',
+          'transform': ''
+        })
+      })
+
     }
 
   }, 50, 100))
@@ -492,85 +528,137 @@ $(function () {
         .find('.toc-child').hide()
     }
 
+  }
+
+  function auto_scroll_toc(currentTop) {
     if ($('.toc-link').hasClass('active')) {
       var active_position = $(".active").offset().top;
       var sidebar_scrolltop = $("#sidebar").scrollTop();
-      if (active_position > (top + $(window).height() - 50)) {
+      if (active_position > (currentTop + $(window).height() - 50)) {
         $("#sidebar").scrollTop(sidebar_scrolltop + 100);
-      } else if (active_position < top + 50) {
+      } else if (active_position < currentTop + 50) {
         $("#sidebar").scrollTop(sidebar_scrolltop - 100);
       }
     }
-
   }
 
-  //代碼框雙擊全屏
-  $('figure').on('dblclick', function (e) {
-    if (e.target !== this)
-      return;
-    $(this).toggleClass('code_full_page');
-    $('body').toggleClass('code_body');
-  });
-
-
-  //閲讀模式
+  /**
+   * 閲讀模式
+   */
   $("#readmode").click(function () {
-
-
     if (Cookies.get("night-mode") == "night") {
       $('body').toggleClass('night-mode');
       $('body').toggleClass('read-mode');
-      $('#font_plus,#font_minus,#to_comment').toggleClass('is_visible');
       $('#to_comment').toggleClass('is_invisible');
-
     } else {
       $('body').toggleClass('read-mode');
-      $('#font_plus,#font_minus,#to_comment').toggleClass('is_visible');
       $('#to_comment').toggleClass('is_invisible');
     }
-
   });
 
-
-  //閲讀模式下字體調整
+  /**
+   * 字體調整
+   */
   $("#font_plus").click(function () {
     var font_size_record = parseFloat($('body').css('font-size'))
-    var code_size_record = parseFloat($('pre').css('font-size'))
+    var pre_size_record = parseFloat($('pre').css('font-size'))
     var code_size_record = parseFloat($('code').css('font-size'))
     $('body').css('font-size', font_size_record + 1)
-    $('pre').css('font-size', font_size_record + 1)
-    $('code').css('font-size', font_size_record + 1)
+    $('pre').css('font-size', pre_size_record + 1)
+    $('code').css('font-size', code_size_record + 1)
   });
 
   $("#font_minus").click(function () {
     var font_size_record = parseFloat($('body').css('font-size'))
-    var code_size_record = parseFloat($('pre').css('font-size'))
+    var pre_size_record = parseFloat($('pre').css('font-size'))
     var code_size_record = parseFloat($('code').css('font-size'))
     $('body').css('font-size', font_size_record - 1)
-    $('pre').css('font-size', font_size_record - 1)
-    $('code').css('font-size', font_size_record - 1)
+    $('pre').css('font-size', pre_size_record - 1)
+    $('code').css('font-size', code_size_record - 1)
   });
 
+  /**
+   * sub-menus 位置調整
+   */
 
-  $('#mobile_toc').on('click', function () {
-    $("#toc_mobile").toggleClass('is_visible')
+  if ($(window).width() > 768) {
+    $('.menus_item_child').each(function () {
+      var a_width = $(this).siblings('a').outerWidth(true);
+      var child_width = $(this).outerWidth(true);
+      $(this).css("margin-left", -(child_width / 2 - a_width / 2))
+    })
+  }
+
+  /**
+   * 手機端sub-menu 展開/收縮
+   */
+  $('.menus-expand').on('click', function () {
+    if ($(this).hasClass('menus-closed')) {
+      $(this).parents('.menus_item').find('.menus_item_child').show();
+      $(this).removeClass('menus-closed');
+    } else {
+      $(this).parents('.menus_item').find('.menus_item_child').hide();
+      $(this).addClass('menus-closed');
+    }
   })
- 
-  //代碼框語言識別
-  $('figure').each(function () {   
-    var lang_name_index;
-    var lang_name;
-    lang_name_index = lang_name = $(this).attr('class').split(' ')[1];
-    if (lang_name_index == 'js')
-      lang_name = 'javascript'
-    if (lang_name_index == 'md')
-      lang_name = 'markdown'
-    if (lang_name_index == 'plain')
-      lang_name = 'code' 
-    if (lang_name_index == 'py')
-      lang_name = 'python'
-        
-    $('figure.' + lang_name_index + ' table').attr('data-content', lang_name);
+
+  /**
+   * rightside 點擊設置 按鈕 展開
+   */
+  $('#rightside_config').on('click', function () {
+    $('#rightside-config-hide').toggleClass("rightside-in")
   })
+  
+  /**
+   * 調正recent_post 上下間距
+   */
+  function recent_post_padding() {
+    $(".recent-post-info").each(function () {
+      var k = $(".recent-post-item").height();
+      var e = $(this).height();
+      $(this).css({
+        "padding-top": (k - e) / 2,
+        "padding-bottom": (k - e) / 2
+      })
+    })
+  }
+
+  //recent-post-item垂直置中
+  if ($(window).width() > 768) {
+    recent_post_padding();
+  }
+
+  $(window).bind("resize", function () {
+    if ($(window).width() > 768) {
+      recent_post_padding();
+    }
+  })
+
+  /**
+   * 複製時加上版權信息
+   */
+  var copy_copyright_js = GLOBAL_CONFIG.copy_copyright_js
+  var copyright = GLOBAL_CONFIG.copyright
+  if (copyright) {
+    document.body.oncopy = event => {
+      event.preventDefault();
+      let textFont, copyFont = window.getSelection(0).toString();
+      if (copyFont.length > 45) {
+        textFont = copyFont + '\n' + '\n' + '\n' +
+          copyright.languages.author + '\n' +
+          copyright.languages.link + '\n' +
+          copyright.languages.source + '\n' +
+          copyright.languages.info;
+      } else {
+        textFont = copyFont;
+      }
+      if (event.clipboardData) {
+        return event.clipboardData.setData('text', textFont);
+      } else {
+        // 兼容IE
+        return window.clipboardData.setData("text", textFont);
+      }
+    }
+  }
 
 });
